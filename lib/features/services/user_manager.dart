@@ -12,7 +12,6 @@ class UserManager extends ChangeNotifier {
   //? Firebase
   final CollectionReference _ref =
       FirebaseFirestore.instance.collection('users');
-
   final CollectionReference _sellerRef =
       FirebaseFirestore.instance.collection('sellers');
   final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -20,6 +19,18 @@ class UserManager extends ChangeNotifier {
 
   UserManager() {
     _firebaseAuth = FirebaseAuth.instance;
+  }
+
+  void isWriting() {
+    _sellerRef.doc(getUser().uid).update({'isTyping': true});
+  }
+
+  void isNotWriting() {
+    _sellerRef.doc(getUser().uid).update({'isTyping': false});
+  }
+
+  void setUserState(bool isOnline) {
+    _sellerRef.doc(getUser().uid).update({'isOnline': isOnline});
   }
 
   //? Create User - Create User Info On Firebase Firestore
