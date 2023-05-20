@@ -4,12 +4,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hent_house_seller/core/validator_mixin.dart';
+import 'package:hent_house_seller/features/presentation/providers/advertisement_provider.dart';
+import 'package:hent_house_seller/features/presentation/providers/user_data_provider.dart';
 import 'package:hent_house_seller/features/presentation/providers/user_provider.dart';
 import 'package:hent_house_seller/features/presentation/upload_ads/widgets/ads_filed_widget.dart';
 import 'package:hent_house_seller/features/presentation/upload_ads/widgets/ads_location_widget.dart';
+import 'package:hent_house_seller/features/presentation/upload_ads/widgets/cstom_int_dropdown.dart';
 import 'package:hent_house_seller/features/presentation/upload_ads/widgets/custom_dropdown_widget.dart';
+import 'package:hent_house_seller/features/presentation/upload_ads/widgets/switch_with_title.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 
 class UploadAdsScreen extends StatefulWidget {
   static const routeName = '/upload-ads-screen';
@@ -24,6 +27,8 @@ class UploadAdsScreen extends StatefulWidget {
 class _UploadAdsScreenState extends State<UploadAdsScreen>
     with ValidationMixins {
   // Controllers
+
+  final GlobalKey<FormState> _formKey = GlobalKey();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
@@ -36,12 +41,13 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
   final List<File> _image = [];
   ImagePicker picker = ImagePicker();
   final _controller = PageController();
+  final HomeAdsServiceProvider _homeAds = HomeAdsServiceProvider();
   //Dropdown Values
-  String toiletValue = '1';
-  String bedRoomsValue = '1';
-  String kitchenValue = '1';
-  String livingRoomValue = '1';
-  List<String> menuList = ['1', '2', '3', '4', '+4'];
+  int toiletValue = 1;
+  int bedRoomsValue = 1;
+  int kitchenValue = 1;
+  int livingRoomValue = 1;
+  List<int> menuList = [1, 2, 3, 4, 5];
   //
   String dropdownCategoryValue = 'Casa';
   List<String> menuCategoryList = ['Casa', 'Quarto', 'Apartamento', 'Vivenda'];
@@ -50,42 +56,57 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
   List<String> menuProvinceList = ['Cuando Cubango', 'Huíla', 'Huambo', 'Uíge'];
 
   final UserAuthProvider _userAuthProvider = UserAuthProvider();
+  final UserDataProvider _dataProvider = UserDataProvider();
+
   publishAds() {
-    final String title = titleController.text.trim();
-    final String description = descriptionController.text.trim();
-    final String phoneNumber = phoneNumberController.text.trim();
-    final String monthlyCash = monthlyCashController.text.trim();
-    final String currentLocation = currentLocationController.text.trim();
-    final String categoryValue = dropdownCategoryValue;
-    final String provinceValue = dropdownProvinceValue;
-    log('tittle: $title');
-    log('description: $description');
-    log('monthlyCash: $monthlyCash');
-    log('monthlyCash: $phoneNumber');
-    log('currentLocation: $currentLocation');
-    log('waterValue: $waterValue');
-    log('electicityValue: $electricityValue');
-    log('yardValue: $yardValue');
-    log('roomValue: $toiletValue');
-    log('bedRoomValue: $bedRoomsValue');
-    log('kitchenValue: $kitchenValue');
-    log('roomValue: $livingRoomValue');
-    log('categoryValue: $categoryValue');
-    log('provinceValue: $provinceValue');
-    log('image: $_image');
+    final validationPassed = _formKey.currentState!.validate();
+    if (validationPassed && _image.isNotEmpty) {
+      final String title = titleController.text.trim();
+      final String additionalDescription = descriptionController.text.trim();
+      final String contact = phoneNumberController.text.trim();
+      final double monthlyPrice = double.parse(
+        monthlyCashController.text.trim(),
+      );
+      final String address = currentLocationController.text.trim();
+      final String categoryValue = dropdownCategoryValue;
+      final String provinceValue = dropdownProvinceValue;
+
+      _homeAds.createAds(
+        title,
+        address,
+        additionalDescription,
+        toiletValue,
+        bedRoomsValue,
+        kitchenValue,
+        livingRoomValue,
+        electricityValue,
+        yardValue,
+        waterValue,
+        categoryValue,
+        contact,
+        monthlyPrice,
+        _dataProvider.currentUser.fullName!,
+        provinceValue,
+        _userAuthProvider.userAddressLatitude!,
+        _userAuthProvider.userAddressLongitude!,
+        _image,
+      );
+    } else {
+      log('Fill all fields.');
+    }
   }
 
   @override
   void initState() {
     super.initState();
     _userAuthProvider.init();
+    _dataProvider.getCurrentUserData();
   }
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       body: SafeArea(
           child: SingleChildScrollView(
@@ -105,59 +126,46 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                         scrollDirection: Axis.horizontal,
                         itemCount: _image.length,
                         itemBuilder: (context, index) {
-                          return Visibility(
-                            visible: index == 0,
-                            replacement: Container(
-                              height: height,
-                              width: width,
-                              decoration: const BoxDecoration(
-                                image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: AssetImage('assets/person.png'),
+                          return Stack(
+                            children: [
+                              Container(
+                                height: height,
+                                width: width,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: FileImage(_image[index]),
+                                  ),
                                 ),
                               ),
-                            ),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  height: height,
-                                  width: width,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: FileImage(_image[index]),
+                              Positioned(
+                                right: 0.0,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _image.remove(_image[index]);
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 35.0,
+                                    width: 35.0,
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 10.0,
+                                      horizontal: 15.0,
+                                    ),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      FontAwesomeIcons.trash,
+                                      size: 15.0,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
-                                Positioned(
-                                  right: 0.0,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _image.remove(_image[index]);
-                                      });
-                                    },
-                                    child: Container(
-                                      height: 35.0,
-                                      width: 35.0,
-                                      margin: const EdgeInsets.symmetric(
-                                        vertical: 10.0,
-                                        horizontal: 15.0,
-                                      ),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.red,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        FontAwesomeIcons.trash,
-                                        size: 15.0,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           );
                         }),
                   ),
@@ -190,208 +198,211 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
               itemCount: _image.length,
             ),
             */
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: width,
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        await _showImageDialogBox();
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          Colors.green,
-                        ),
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0),
+            Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: width,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          await _showImageDialogBox();
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            Colors.green,
+                          ),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
                           ),
                         ),
-                      ),
-                      label: const Text(
-                        'Carregar Imagem',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15.0,
+                        label: const Text(
+                          'Carregar Imagem',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15.0,
+                          ),
                         ),
-                      ),
-                      icon: const Icon(
-                        FontAwesomeIcons.image,
-                        color: Colors.white,
+                        icon: const Icon(
+                          FontAwesomeIcons.image,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
-                  AdsFieldWidget(
-                    icon: FontAwesomeIcons.circleInfo,
-                    controller: titleController,
-                    validator: (value) => insNotEmpty(value),
-                    textLabel: 'Titulo do Anúncio',
-                    fieldLabel: 'Titulo',
-                  ),
-                  AdsFieldWidget(
-                    icon: FontAwesomeIcons.info,
-                    controller: descriptionController,
-                    validator: (value) => insNotEmpty(value),
-                    textLabel: 'Descrição',
-                    fieldLabel: 'Descrição',
-                  ),
-                  AdsFieldWidget(
-                    icon: FontAwesomeIcons.phone,
-                    controller: phoneNumberController,
-                    validator: (value) => insNotEmpty(value),
-                    textLabel: 'Número de Telefone',
-                    fieldLabel: 'Contacto',
-                  ),
-                  AdsFieldWidget(
-                    icon: FontAwesomeIcons.moneyBill,
-                    controller: monthlyCashController,
-                    validator: (value) => insNotEmpty(value),
-                    textLabel: 'Valor Mensal',
-                    fieldLabel: 'Valor',
-                  ),
-                  AdsLocationFieldWidget(
-                    controller: currentLocationController,
-                    validator: (value) => insNotEmpty(value),
-                    textLabel: 'Localização',
-                    fieldLabel: 'Localização',
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SwitchWithTitleWidget(
-                        label: 'Água',
-                        value: waterValue,
-                        onChanged: (bool newValue) {
-                          setState(() {
-                            waterValue = newValue;
-                          });
-                        },
-                      ),
-                      SwitchWithTitleWidget(
-                          label: 'Eletricidade',
-                          value: electricityValue,
-                          onChanged: (bool newValue) {
-                            setState(() {
-                              electricityValue = newValue;
-                            });
-                          }),
-                      SwitchWithTitleWidget(
-                          label: 'Quintal',
-                          value: yardValue,
-                          onChanged: (bool newValue) {
-                            setState(() {
-                              yardValue = newValue;
-                            });
-                          }),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CustomDropdownMenu(
-                        textLabel: 'WC',
-                        dropdownValue: toiletValue,
-                        menuList: menuList,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            toiletValue = newValue!;
-                          });
-                        },
-                      ),
-                      CustomDropdownMenu(
-                        textLabel: 'Quartos',
-                        dropdownValue: bedRoomsValue,
-                        menuList: menuList,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            bedRoomsValue = newValue!;
-                          });
-                        },
-                      ),
-                      CustomDropdownMenu(
-                        textLabel: 'Cozinha',
-                        dropdownValue: kitchenValue,
-                        menuList: menuList,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            kitchenValue = newValue!;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Row(
+                    AdsFieldWidget(
+                      icon: FontAwesomeIcons.circleInfo,
+                      controller: titleController,
+                      validator: (value) => insNotEmpty(value),
+                      textLabel: 'Titulo do Anúncio',
+                      fieldLabel: 'Titulo',
+                    ),
+                    AdsFieldWidget(
+                      icon: FontAwesomeIcons.info,
+                      controller: descriptionController,
+                      validator: (value) => insNotEmpty(value),
+                      textLabel: 'Descrição',
+                      fieldLabel: 'Descrição',
+                    ),
+                    AdsFieldWidget(
+                      icon: FontAwesomeIcons.phone,
+                      controller: phoneNumberController,
+                      validator: (value) => insNotEmpty(value),
+                      textLabel: 'Número de Telefone',
+                      fieldLabel: 'Contacto',
+                    ),
+                    AdsFieldWidget(
+                      icon: FontAwesomeIcons.moneyBill,
+                      controller: monthlyCashController,
+                      validator: (value) => insNotEmpty(value),
+                      textLabel: 'Valor Mensal',
+                      fieldLabel: 'Valor',
+                    ),
+                    AdsLocationFieldWidget(
+                      controller: currentLocationController,
+                      validator: (value) => insNotEmpty(value),
+                      textLabel: 'Localização',
+                      fieldLabel: 'Localização',
+                    ),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        CustomDropdownMenu(
-                          textLabel: 'Sala',
-                          dropdownValue: livingRoomValue,
+                        SwitchWithTitleWidget(
+                          label: 'Água',
+                          value: waterValue,
+                          onChanged: (bool newValue) {
+                            setState(() {
+                              waterValue = newValue;
+                            });
+                          },
+                        ),
+                        SwitchWithTitleWidget(
+                            label: 'Eletricidade',
+                            value: electricityValue,
+                            onChanged: (bool newValue) {
+                              setState(() {
+                                electricityValue = newValue;
+                              });
+                            }),
+                        SwitchWithTitleWidget(
+                            label: 'Quintal',
+                            value: yardValue,
+                            onChanged: (bool newValue) {
+                              setState(() {
+                                yardValue = newValue;
+                              });
+                            }),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomIntDropdownMenu(
+                          textLabel: 'WC',
+                          dropdownValue: toiletValue,
                           menuList: menuList,
-                          onChanged: (String? newValue) {
+                          onChanged: (int? newValue) {
                             setState(() {
-                              livingRoomValue = newValue!;
+                              toiletValue = newValue!;
                             });
                           },
                         ),
-                        CustomDropdownMenu(
-                          textLabel: 'Categoria',
-                          dropdownValue: dropdownCategoryValue,
-                          menuList: menuCategoryList,
-                          onChanged: (String? newValue) {
+                        CustomIntDropdownMenu(
+                          textLabel: 'Quartos',
+                          dropdownValue: bedRoomsValue,
+                          menuList: menuList,
+                          onChanged: (int? newValue) {
                             setState(() {
-                              dropdownCategoryValue = newValue!;
+                              bedRoomsValue = newValue!;
                             });
                           },
                         ),
-                        CustomDropdownMenu(
-                          textLabel: 'Província',
-                          dropdownValue: dropdownProvinceValue,
-                          menuList: menuProvinceList,
-                          onChanged: (String? newValue) {
+                        CustomIntDropdownMenu(
+                          textLabel: 'Cozinha',
+                          dropdownValue: kitchenValue,
+                          menuList: menuList,
+                          onChanged: (int? newValue) {
                             setState(() {
-                              dropdownProvinceValue = newValue!;
+                              kitchenValue = newValue!;
                             });
                           },
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(
-                    width: width,
-                    child: ElevatedButton.icon(
-                      onPressed: () => publishAds(),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          Colors.brown.shade500,
-                        ),
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CustomIntDropdownMenu(
+                            textLabel: 'Sala',
+                            dropdownValue: livingRoomValue,
+                            menuList: menuList,
+                            onChanged: (int? newValue) {
+                              setState(() {
+                                livingRoomValue = newValue!;
+                              });
+                            },
                           ),
-                        ),
-                      ),
-                      label: const Text(
-                        'Publicar',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15.0,
-                        ),
-                      ),
-                      icon: const Icon(
-                        FontAwesomeIcons.upload,
-                        color: Colors.white,
+                          CustomDropdownMenu(
+                            textLabel: 'Categoria',
+                            dropdownValue: dropdownCategoryValue,
+                            menuList: menuCategoryList,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                dropdownCategoryValue = newValue!;
+                              });
+                            },
+                          ),
+                          CustomDropdownMenu(
+                            textLabel: 'Província',
+                            dropdownValue: dropdownProvinceValue,
+                            menuList: menuProvinceList,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                dropdownProvinceValue = newValue!;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(
+                      width: width,
+                      child: ElevatedButton.icon(
+                        onPressed: () => publishAds(),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            Colors.brown.shade500,
+                          ),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
+                          ),
+                        ),
+                        label: const Text(
+                          'Publicar',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                        icon: const Icon(
+                          FontAwesomeIcons.upload,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -401,7 +412,6 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
   }
 
   Future<void> _showImageDialogBox() async {
-    final authData = Provider.of<UserAuthProvider>(context, listen: false);
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -484,48 +494,12 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
     );
 
     if (pickedFile != null) {
-      print("Picked image path: ${pickedFile.path}");
+      log("Picked image path: ${pickedFile.path}");
       setState(() {
         _image.add(File(pickedFile.path));
       });
     } else {
-      print("Image selection cancelled.");
+      log("Image selection cancelled.");
     }
-  }
-}
-
-class SwitchWithTitleWidget extends StatefulWidget {
-  bool value;
-  final String label;
-  Function(bool)? onChanged;
-  SwitchWithTitleWidget({
-    super.key,
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
-
-  @override
-  State<SwitchWithTitleWidget> createState() => _SwitchWithTitleWidgetState();
-}
-
-class _SwitchWithTitleWidgetState extends State<SwitchWithTitleWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          widget.label,
-          style: const TextStyle(
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Switch(
-          value: widget.value,
-          onChanged: widget.onChanged,
-        ),
-      ],
-    );
   }
 }
