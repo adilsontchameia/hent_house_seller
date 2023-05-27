@@ -9,7 +9,6 @@ import 'package:hent_house_seller/features/presentation/profile/profile_screen.d
 import 'package:hent_house_seller/features/presentation/register/register_screen.dart';
 import 'package:hent_house_seller/features/presentation/route_error/route_error.dart';
 import 'package:hent_house_seller/features/presentation/sale_detail/sale_detail_screen.dart';
-import 'package:hent_house_seller/features/presentation/sale_detail/widget/immersive_viewer_screen.dart';
 import 'package:hent_house_seller/features/presentation/upload_ads/upload_ads_screen.dart';
 import 'package:hent_house_seller/features/presentation/widgets/widgets.dart';
 
@@ -22,12 +21,14 @@ Route<dynamic> generateRoute(RouteSettings settings) {
                 advertisement: advertisement,
               ));
     case HomeResumeScreen.routeName:
-      return MaterialPageRoute(builder: (context) => HomeResumeScreen());
-    case UploadAdsScreen.routeName:
-      return MaterialPageRoute(builder: (context) => const UploadAdsScreen());
-
+      return MaterialPageRoute(
+        builder: (context) => HomeResumeScreen(),
+      );
+    //UploadAdsScreen
     case ListChatMessagesScreen.routeName:
-      return MaterialPageRoute(builder: (context) => ListChatMessagesScreen());
+      return MaterialPageRoute(
+        builder: (context) => const ListChatMessagesScreen(),
+      );
     case ChatMessagesScreen.routeName:
       final arguments = settings.arguments as Map<String, dynamic>;
       final name = arguments['name'];
@@ -39,23 +40,29 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         ),
       );
     case CheckAuthScreen.routeName:
-      return MaterialPageRoute(builder: (context) => const CheckAuthScreen());
+      return MaterialPageRoute(
+        builder: (context) => const CheckAuthScreen(),
+      );
     case LoginScreen.routeName:
-      return MaterialPageRoute(builder: (context) => const LoginScreen());
+      return MaterialPageRoute(
+        builder: (context) => const LoginScreen(),
+      );
     case RegisterScreen.routeName:
-      return MaterialPageRoute(builder: (context) => const RegisterScreen());
+      return MaterialPageRoute(
+        builder: (context) => const RegisterScreen(),
+      );
     case ProfileScreen.routeName:
-      return MaterialPageRoute(builder: (context) => ProfileScreen());
+      return MaterialPageRoute(
+        builder: (context) => ProfileScreen(),
+      );
     case FilteredAdvertisimentScreen.routeName:
       return MaterialPageRoute(
-          builder: (context) => const FilteredAdvertisimentScreen());
-    case ImmersiveViewerScreen.routeName:
-      final arguments = settings.arguments as Map<String, dynamic>;
-      final imageIndex = arguments['imageIndex'];
-      return MaterialPageRoute(
-        builder: (context) => ImmersiveViewerScreen(imageIndex: imageIndex),
+        builder: (context) => const FilteredAdvertisimentScreen(),
       );
-
+    case UploadAdsScreen.routeName:
+      return MaterialPageRoute(
+        builder: (context) => const UploadAdsScreen(),
+      );
     default:
       return MaterialPageRoute(
           builder: (context) => const RouteErrorScreen(
