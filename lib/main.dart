@@ -20,8 +20,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<HomeAdvertisementProvider>(
-          create: (_) => HomeAdvertisementProvider(),
+        ChangeNotifierProvider<HomeAdsServiceProvider>(
+          create: (_) => HomeAdsServiceProvider(),
           lazy: false,
         ),
         ChangeNotifierProvider<UserAuthProvider>(
