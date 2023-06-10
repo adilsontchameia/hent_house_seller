@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 class MyMessageCard extends StatelessWidget {
   final String message;
   final String date;
+  final bool isSeen;
 
-  const MyMessageCard({Key? key, required this.message, required this.date})
-      : super(key: key);
+  const MyMessageCard({
+    Key? key,
+    required this.message,
+    required this.date,
+    required this.isSeen,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +50,10 @@ class MyMessageCard extends StatelessWidget {
                     const SizedBox(
                       width: 5,
                     ),
-                    const Icon(
-                      Icons.done_all,
+                    Icon(
+                      isSeen ? Icons.done_all : Icons.done,
                       size: 15,
-                      color: Colors.white54,
+                      color: isSeen ? Colors.blue : Colors.white54,
                     ),
                   ],
                 ),
