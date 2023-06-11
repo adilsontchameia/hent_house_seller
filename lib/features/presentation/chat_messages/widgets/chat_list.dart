@@ -71,6 +71,7 @@ class _ChatListState extends State<ChatList> {
                   final message = messages[index];
                   final isMe = message.senderId == _authService.getUser().uid;
 
+                  //? Check if another user read the message
                   if (!message.isSeen &&
                       message.receiverId == _authService.getUser().uid) {
                     _chatService.setChatMessageSeen(
@@ -78,18 +79,19 @@ class _ChatListState extends State<ChatList> {
                       message.messageId,
                     );
                   }
+                  DateTime dateTime = message.date;
+                  String formattedTime = DateFormat('HH:mm').format(dateTime);
 
-                  String formattedDate = DateFormat.jm().format(message.date);
                   if (isMe) {
                     return MyMessageCard(
                       message: message.message,
-                      date: formattedDate,
+                      date: formattedTime.toString(),
                       isSeen: message.isSeen,
                     );
                   } else {
                     return SenderMessageCard(
                       message: message.message,
-                      date: formattedDate,
+                      date: formattedTime.toString(),
                     );
                   }
                 },
