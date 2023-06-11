@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hent_house_seller/features/data/models/user_model.dart';
 import 'package:hent_house_seller/features/services/chat_service.dart';
 import 'package:hent_house_seller/features/services/user_manager.dart';
 
 class BottomChatField extends StatefulWidget {
   final String receiverId;
+  final UserModel currentUserData;
   const BottomChatField({
     Key? key,
     required this.receiverId,
+    required this.currentUserData,
   }) : super(key: key);
 
   @override
@@ -27,9 +30,11 @@ class _BottomChatFieldState extends State<BottomChatField> {
         _chatService.sendTextMessage(
           message: message,
           userId: widget.receiverId,
+          currentUserData: widget.currentUserData,
         );
       }
       _messageController.text = '';
+      isWritting = false;
       _userManager.isNotWriting();
     });
   }
