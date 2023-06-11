@@ -5,6 +5,7 @@ import 'package:hent_house_seller/features/presentation/list_chat_messages/list_
 import 'package:hent_house_seller/features/presentation/filtered_advertisiment/filtered_advertisiment_screen.dart';
 import 'package:hent_house_seller/features/presentation/home_screen/home_screen.dart';
 import 'package:hent_house_seller/features/presentation/profile/profile_screen.dart';
+import 'package:hent_house_seller/features/services/user_manager.dart';
 
 class BottomNavigationScreens extends StatefulWidget {
   static const routeName = '/bottom-navigation-screens';
@@ -25,14 +26,46 @@ final tabIcons = [
 final appPages = [
   HomeResumeScreen(),
   const FilteredAdvertisimentScreen(),
-  ListChatMessagesScreen(),
+  const ListChatMessagesScreen(),
   ProfileScreen(),
 ];
 
-class _BottomNavigationScreensState extends State<BottomNavigationScreens> {
+class _BottomNavigationScreensState extends State<BottomNavigationScreens>
+    with WidgetsBindingObserver {
   int currentIndex = 0;
   bool isVisible = true;
   final pageController = PageController(initialPage: 0);
+  final UserManager _userManager = UserManager();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      super.didChangeAppLifecycleState(state);
+      switch (state) {
+        case AppLifecycleState.resumed:
+          _userManager.setUserState(true);
+          break;
+        case AppLifecycleState.inactive:
+        case AppLifecycleState.detached:
+        case AppLifecycleState.paused:
+          _userManager.setUserState(false);
+          break;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
