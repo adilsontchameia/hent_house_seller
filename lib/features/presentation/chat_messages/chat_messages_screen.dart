@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hent_house_seller/features/presentation/chat_messages/widgets/bottom_chat_field.dart';
 import 'package:hent_house_seller/features/presentation/chat_messages/widgets/chat_list.dart';
+import 'package:hent_house_seller/features/presentation/providers/user_data_provider.dart';
 import 'package:hent_house_seller/features/presentation/widgets/error_icon_on_fetching.dart';
-import 'package:hent_house_seller/features/services/auth_service.dart';
 import 'package:hent_house_seller/features/services/user_manager.dart';
 
 import '../home_screen/home.dart';
@@ -23,8 +23,23 @@ class ChatMessagesScreen extends StatefulWidget {
 }
 
 class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
+  UserDataProvider userDataProvider = UserDataProvider();
   final UserManager _userManager = UserManager();
-  final AuthService _authService = AuthService();
+
+  Future<void> fetchCurrentUser() async {
+    await userDataProvider.getCurrentUserData();
+
+    log('User found');
+    log(userDataProvider.currentUser.fullName!);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    fetchCurrentUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -39,7 +54,7 @@ class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
             stream: _userManager.getSellerById(widget.uid),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return Container();
               }
               return Row(
                 children: [
@@ -79,14 +94,15 @@ class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
                             .doc(widget.uid)
                             .snapshots(),
                         builder: (context, snapshot) {
-                          log('ID: ${widget.uid}');
-                          log('UserID: ${_authService.getUser().uid}');
                           if (snapshot.hasData) {
                             final isTyping =
                                 snapshot.data?.get('isTyping') ?? false;
+                            final status = snapshot.data?.get('isOnline')
+                                ? 'Online'
+                                : 'Offline';
 
                             return Text(
-                              isTyping ? 'Typing...' : 'Online',
+                              isTyping ? 'Escrevendo...' : status,
                               style: TextStyle(
                                 color: isTyping ? Colors.green : Colors.black38,
                                 fontWeight: FontWeight.bold,
@@ -108,9 +124,12 @@ class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
       body: Column(
         children: [
           Expanded(
-            child: ChatList(sellerId: widget.uid),
+            child: ChatList(userId: widget.uid),
           ),
-          BottomChatField(receiverId: widget.uid),
+          BottomChatField(
+            receiverId: widget.uid,
+            currentUserData: userDataProvider.currentUser,
+          ),
         ],
       ),
     );
