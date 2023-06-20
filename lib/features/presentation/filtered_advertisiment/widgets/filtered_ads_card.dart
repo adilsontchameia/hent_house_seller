@@ -5,11 +5,11 @@ import 'package:hent_house_seller/core/currency_formart.dart';
 import 'package:hent_house_seller/features/data/models/advertisement_model.dart';
 import 'package:hent_house_seller/features/presentation/filtered_advertisiment/widgets/filtered_card_content.dart';
 import 'package:hent_house_seller/features/presentation/home_screen/widgets/search_text_field.dart';
+import 'package:hent_house_seller/features/presentation/providers/advertisement_provider.dart';
 import 'package:hent_house_seller/features/presentation/sale_detail/sale_detail_screen.dart';
 import 'package:hent_house_seller/features/presentation/widgets/circular_on_fetching.dart';
 import 'package:hent_house_seller/features/presentation/widgets/error_icon_on_fetching.dart';
 import 'package:hent_house_seller/features/presentation/widgets/no_matching_result_found.dart';
-import 'package:hent_house_seller/features/services/advertisement_service.dart';
 
 import '../filtered_advertisiment.dart';
 
@@ -27,15 +27,14 @@ class FilteredAdvertisimentCard extends StatefulWidget {
 
 class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
   final TextEditingController _searchController = TextEditingController();
-  final HomeAdvertisementManager advertisementManager =
-      HomeAdvertisementManager();
+  final HomeAdsServiceProvider advertisementManager = HomeAdsServiceProvider();
   String query = '';
   bool? topPickedFilter;
   String? categoryFilter;
 
   String? provinceFilter;
-  int? minPriceFilter;
-  int? maxPriceFilter;
+  double? minPriceFilter;
+  double? maxPriceFilter;
   late bool isVisible;
   late bool isButtonSelected;
   final double minPrice = 5000.0;
@@ -174,30 +173,6 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                     isSelected: buttonSelectedStates[4],
                     index: 4,
                   ),
-                  /*
-                  DropdownButton<String>(
-                    dropdownColor: Colors.brown,
-                    value: provinceFilter,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        if (newValue == 'Todas Provincias') {
-                          provinceFilter =
-                              null; // Clear the provinceFilter when "Todas Provincias" is selected
-                        } else {
-                          provinceFilter =
-                              newValue; // Update the provinceFilter for other provinces
-                        }
-                      });
-                    },
-                    items: provincesAvailable
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  )
-                  */
                 ],
               ),
             ]),
@@ -228,14 +203,14 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                 ),
                 onChanged: (RangeValues values) {
                   setState(() {
-                    minPriceFilter = values.start.round();
-                    maxPriceFilter = values.end.round();
+                    minPriceFilter = values.start.round().toDouble();
+                    maxPriceFilter = values.end.round().toDouble();
                   });
                 },
               ),
             ]),
         StreamBuilder<List<AdvertisementModel>>(
-          stream: advertisementManager.getAllSales(),
+          stream: advertisementManager.getAllAds(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressOnFecthing();
@@ -295,12 +270,12 @@ class _FilteredAdvertisimentCardState extends State<FilteredAdvertisimentCard> {
                   }
 
                   if (minPriceFilter != null &&
-                      (ads.monthlyPrice as int) < minPriceFilter!) {
+                      (ads.monthlyPrice as double) < minPriceFilter!) {
                     return false;
                   }
 
                   if (maxPriceFilter != null &&
-                      (ads.monthlyPrice as int) > maxPriceFilter!) {
+                      (ads.monthlyPrice as double) > maxPriceFilter!) {
                     return false;
                   }
 
