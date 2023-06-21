@@ -3,11 +3,14 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:get/get.dart';
 import 'package:hent_house_seller/core/factories/dialogs.dart';
 import 'package:hent_house_seller/features/data/models/advertisement_model.dart';
 import 'package:hent_house_seller/features/presentation/sale_detail/sale_details.dart';
 import 'package:hent_house_seller/features/services/auth_service.dart';
 import 'package:uuid/uuid.dart';
+
+import '../bottom_navigation_pages/bottom_navigation_screen.dart';
 
 class HomeAdsServiceProvider extends ChangeNotifier {
   //? Firebase
@@ -114,7 +117,7 @@ class HomeAdsServiceProvider extends ChangeNotifier {
       });
 
       _dialogs.disposeProgressIndicator();
-      //Get.off(() => const BottomNavigationScreens());
+      Get.off(() => const BottomNavigationScreens());
     } catch (e) {
       _dialogs.disposeProgressIndicator();
       _dialogs.showToastMessage(e.toString());
