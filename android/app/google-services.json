@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "867211967543",
+    "project_id": "homerent-a6208",
+    "storage_bucket": "homerent-a6208.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:867211967543:android:e3f6fe118976a70c3053b2",
+        "android_client_info": {
+          "package_name": "com.example.hent_house_seller"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "867211967543-lgjbc20vk5ci5suufq7jqltuqp6mvede.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBgogaa5FelhTlgQVpZfJWm_JUjYgwQ0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "867211967543-lgjbc20vk5ci5suufq7jqltuqp6mvede.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "867211967543-b3c9vai1vhmu07ei76fardnqv49h9mhm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.hentHouseSeller"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:867211967543:android:8f149e06072dc0293053b2",
+        "android_client_info": {
+          "package_name": "com.example.rent_house_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "867211967543-vd09sq3tuibka7602q4isqo12bpni9ej.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rent_house_app",
+            "certificate_hash": "1076d5ea778eaca727c1ba3ab23e1156134b71c2"
+          }
+        },
+        {
+          "client_id": "867211967543-lgjbc20vk5ci5suufq7jqltuqp6mvede.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBgogaa5FelhTlgQVpZfJWm_JUjYgwQ0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "867211967543-lgjbc20vk5ci5suufq7jqltuqp6mvede.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "867211967543-b3c9vai1vhmu07ei76fardnqv49h9mhm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.hentHouseSeller"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
