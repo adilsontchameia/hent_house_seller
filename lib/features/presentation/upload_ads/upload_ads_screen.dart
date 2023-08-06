@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hent_house_seller/core/validator_mixin.dart';
@@ -36,13 +38,17 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
 
   final AuthService _authService = AuthService();
 
-  String dropdownValue = 'One';
-  List<String> menuList = [
-    'One',
-    'Two',
-    'Free',
-    'Four',
-  ];
+  String dropdownValue = '1';
+  List<String> menuList = ['1', '2', '3', '4', '+4'];
+
+  String dropdownBoolValue = 'SIM';
+  List<String> menuBoolList = ['SIM', 'NÃO'];
+
+  String dropdownCategoryValue = 'Casa';
+  List<String> menuCategoryList = ['Casa', 'Quarto', 'Apartamento', 'Vivenda'];
+
+  String dropdownProvinceValue = 'Cuando Cubango';
+  List<String> menuProvinceList = ['Cuando Cubango', 'Huíla', 'Huambo', 'Uíge'];
 
   @override
   Widget build(BuildContext context) {
@@ -51,25 +57,22 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          child: SingleChildScrollView(
+              child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
-                Center(
-                  child: Column(
-                    children: [
-                      Stack(
-                        children: [
-                          Container(
-                            color: Colors.amber,
-                            child: Image.asset(
-                              'assets/panorama.jpg',
-                              height: 250.0,
-                              width: width,
-                              fit: BoxFit.fitHeight,
+                Container(
+                  color: Colors.amber,
+                  child: Image.asset(
+                    'assets/panorama.jpg',
+                    height: 250.0,
+                    width: width,
+                    fit: BoxFit.fitHeight,
 
-                              /*
+                    /*
                                 CachedNetworkImage(
                                   imageUrl: userModel.image!,
                                   fit: BoxFit.fill,
@@ -89,133 +92,168 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                                       const ErrorIconOnFetching(),
                                 ),
                                 */
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Container(
-                              height: 35.0,
-                              width: 35.0,
-                              margin: const EdgeInsets.symmetric(
-                                vertical: 10.0,
-                                horizontal: 15.0,
-                              ),
-                              decoration: const BoxDecoration(
-                                color: Colors.brown,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                FontAwesomeIcons.x,
-                                size: 15.0,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    height: 35.0,
+                    width: 35.0,
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 10.0,
+                      horizontal: 15.0,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Colors.brown,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      FontAwesomeIcons.x,
+                      size: 15.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Imagens Selecionadas: x',
+                    style: TextStyle(
+                      fontSize: 13.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  AdsFieldWidget(
+                    icon: FontAwesomeIcons.circleInfo,
+                    controller: firstNameController,
+                    validator: (value) => insNotEmpty(value),
+                    textLabel: 'Titulo do Anúncio',
+                    fieldLabel: 'Titulo',
+                  ),
+                  AdsFieldWidget(
+                    icon: FontAwesomeIcons.info,
+                    controller: firstNameController,
+                    validator: (value) => insNotEmpty(value),
+                    textLabel: 'Descrição',
+                    fieldLabel: 'Descrição',
+                  ),
+                  AdsFieldWidget(
+                    icon: FontAwesomeIcons.phone,
+                    controller: firstNameController,
+                    validator: (value) => insNotEmpty(value),
+                    textLabel: 'Número de Telefone',
+                    fieldLabel: 'Contacto',
+                  ),
+                  AdsFieldWidget(
+                    icon: FontAwesomeIcons.moneyBill,
+                    controller: firstNameController,
+                    validator: (value) => insNotEmpty(value),
+                    textLabel: 'Valor Mensal',
+                    fieldLabel: 'Valor',
+                  ),
+                  AdsLocationFieldWidget(
+                    controller: firstNameController,
+                    validator: (value) => insNotEmpty(value),
+                    textLabel: 'Localização',
+                    fieldLabel: 'Localização',
+                  ),
+                  Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: 15.0,
+                    children: [
+                      CustomDropdownMenu(
+                        textLabel: 'WC',
+                        dropdownValue: dropdownValue,
+                        menuList: menuList,
                       ),
-                      const SizedBox(height: 10.0),
-                      AdsFieldWidget(
-                        controller: firstNameController,
-                        validator: (value) => insNotEmpty(value),
-                        textLabel: 'Titulo do Anúncio',
-                        fieldLabel: 'Titulo',
+                      CustomDropdownMenu(
+                        textLabel: 'Água',
+                        dropdownValue: dropdownBoolValue,
+                        menuList: menuBoolList,
                       ),
-                      AdsFieldWidget(
-                        controller: firstNameController,
-                        validator: (value) => insNotEmpty(value),
-                        textLabel: 'Descrição',
-                        fieldLabel: 'Descrição',
+                      CustomDropdownMenu(
+                        textLabel: 'Quartos',
+                        dropdownValue: dropdownValue,
+                        menuList: menuList,
                       ),
-                      AdsLocationFieldWidget(
-                        controller: firstNameController,
-                        validator: (value) => insNotEmpty(value),
-                        textLabel: 'Localização',
-                        fieldLabel: 'Localização',
+                      CustomDropdownMenu(
+                        textLabel: 'Cozinha',
+                        dropdownValue: dropdownValue,
+                        menuList: menuList,
                       ),
-                      AdsLocationFieldWidget(
-                        controller: firstNameController,
-                        validator: (value) => insNotEmpty(value),
-                        textLabel: 'Contacto',
-                        fieldLabel: 'Contacto',
-                      ),
-                      Wrap(
-                        alignment: WrapAlignment.spaceAround,
-                        spacing: 5.0,
-                        children: [
-                          CustomDropdownMenu(
-                            textLabel: 'WC',
-                            dropdownValue: dropdownValue,
-                            menuList: menuList,
-                          ),
-                          CustomDropdownMenu(
-                            textLabel: 'Quartos',
-                            dropdownValue: dropdownValue,
-                            menuList: menuList,
-                          ),
-                          CustomDropdownMenu(
-                            textLabel: 'Cozinha',
-                            dropdownValue: dropdownValue,
-                            menuList: menuList,
-                          ),
-                          CustomDropdownMenu(
-                            textLabel: 'Sala de Estar',
-                            dropdownValue: dropdownValue,
-                            menuList: menuList,
-                          ),
-                        ],
-                      ),
-                      CustomInputText(
-                        icon: Icons.phone,
-                        isPassword: false,
-                        keyboardType: TextInputType.name,
-                        controller: phoneController,
-                        label: 'Telefone',
-                        fontSize: 15.0,
-                        validator: (value) => insNotEmpty(value),
-                      ),
-                      CustomInputText(
-                        icon: Icons.password,
-                        isPassword: true,
-                        keyboardType: TextInputType.name,
-                        controller: passwordController,
-                        label: 'Senha',
-                        fontSize: 15.0,
-                        validator: (value) => insNotEmpty(value),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.85,
-                        child: ElevatedButton.icon(
-                          onPressed: () {},
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                              Colors.brown.shade500,
-                            ),
-                            shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                            ),
-                          ),
-                          label: const Text(
-                            'Carregar',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15.0,
-                            ),
-                          ),
-                          icon: const Icon(
-                            FontAwesomeIcons.upload,
-                            color: Colors.white,
-                          ),
-                        ),
+                      CustomDropdownMenu(
+                        textLabel: 'Quintal',
+                        dropdownValue: dropdownBoolValue,
+                        menuList: menuBoolList,
                       ),
                     ],
                   ),
-                )
-              ],
-            )),
-      ),
+                  Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: 10.0,
+                    children: [
+                      CustomDropdownMenu(
+                        textLabel: 'Eletricidade',
+                        dropdownValue: dropdownBoolValue,
+                        menuList: menuBoolList,
+                      ),
+                      CustomDropdownMenu(
+                        textLabel: 'Sala de Estar',
+                        dropdownValue: dropdownValue,
+                        menuList: menuList,
+                      ),
+                      CustomDropdownMenu(
+                        textLabel: 'Categoria',
+                        dropdownValue: dropdownCategoryValue,
+                        menuList: menuCategoryList,
+                      ),
+                      CustomDropdownMenu(
+                        textLabel: 'Província',
+                        dropdownValue: dropdownProvinceValue,
+                        menuList: menuProvinceList,
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    width: width,
+                    child: ElevatedButton.icon(
+                      onPressed: () => log('Uploading'),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          Colors.brown.shade500,
+                        ),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                        ),
+                      ),
+                      label: const Text(
+                        'Carregar',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15.0,
+                        ),
+                      ),
+                      icon: const Icon(
+                        FontAwesomeIcons.upload,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ))),
     );
   }
 }
@@ -225,12 +263,14 @@ class AdsFieldWidget extends StatefulWidget {
   final String? Function(String?)? validator;
   final String textLabel;
   final String fieldLabel;
+  final IconData icon;
   const AdsFieldWidget({
     super.key,
     required this.controller,
     required this.validator,
     required this.textLabel,
     required this.fieldLabel,
+    required this.icon,
   });
 
   @override
@@ -251,7 +291,7 @@ class _AdsFieldWidgetState extends State<AdsFieldWidget> {
           ),
         ),
         CustomInputText(
-          icon: Icons.person,
+          icon: widget.icon,
           isPassword: false,
           controller: widget.controller,
           keyboardType: TextInputType.name,
