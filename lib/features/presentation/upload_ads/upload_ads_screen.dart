@@ -1,12 +1,14 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hent_house_seller/core/utils.dart';
 import 'package:hent_house_seller/core/validator_mixin.dart';
-import 'package:hent_house_seller/features/presentation/register/widgets/location_text_input.dart';
-import 'package:hent_house_seller/features/presentation/widgets/custom_input_text.dart';
-import 'package:hent_house_seller/features/services/auth_service.dart';
-import 'package:hent_house_seller/features/services/user_manager.dart';
+import 'package:hent_house_seller/features/presentation/upload_ads/widgets/ads_filed_widget.dart';
+import 'package:hent_house_seller/features/presentation/upload_ads/widgets/ads_location_widget.dart';
+import 'package:hent_house_seller/features/presentation/upload_ads/widgets/custom_dropdown_widget.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UploadAdsScreen extends StatefulWidget {
   static const routeName = '/upload-ads-screen';
@@ -22,31 +24,21 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
     with ValidationMixins {
   // Controllers
   final TextEditingController firstNameController = TextEditingController();
-
   final TextEditingController surnNameController = TextEditingController();
-
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController phoneController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
-
   final TextEditingController currentLocationController =
       TextEditingController();
-
-  final UserManager _userManager = UserManager();
-
-  final AuthService _authService = AuthService();
-
+  final List<File> _image = [];
+  ImagePicker picker = ImagePicker();
+  //Dropdown Values
   String dropdownValue = '1';
   List<String> menuList = ['1', '2', '3', '4', '+4'];
-
   String dropdownBoolValue = 'SIM';
   List<String> menuBoolList = ['SIM', 'NÃO'];
-
   String dropdownCategoryValue = 'Casa';
   List<String> menuCategoryList = ['Casa', 'Quarto', 'Apartamento', 'Vivenda'];
-
   String dropdownProvinceValue = 'Cuando Cubango';
   List<String> menuProvinceList = ['Cuando Cubango', 'Huíla', 'Huambo', 'Uíge'];
 
@@ -65,52 +57,103 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
             Stack(
               children: [
                 Container(
-                  color: Colors.amber,
-                  child: Image.asset(
-                    'assets/panorama.jpg',
-                    height: 250.0,
+                  color: const Color.fromARGB(255, 246, 246, 246),
+                  child: SizedBox(
+                    height: height * 0.5,
                     width: width,
-                    fit: BoxFit.fitHeight,
-
-                    /*
-                                CachedNetworkImage(
-                                  imageUrl: userModel.image!,
-                                  fit: BoxFit.fill,
-                                  height: 80.0,
-                                  width: 80.0,
-                                  placeholder: (context, str) => Center(
-                                    child: Container(
-                                      color: Colors.white,
-                                      height: height,
-                                      width: width,
-                                      child: Image.asset(
-                                        'assets/loading.gif',
-                                      ),
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      const ErrorIconOnFetching(),
+                    child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _image.length,
+                        itemBuilder: (context, index) {
+                          if (_image.isEmpty) {
+                            return Image.asset(
+                              'assets/person.png',
+                              fit: BoxFit.fitHeight,
+                            );
+                          } else {
+                            return Container(
+                              height: 250.0,
+                              width: width,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: FileImage(_image[index]),
                                 ),
-                                */
+                              ),
+                            );
+                          }
+                        }),
                   ),
                 ),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    height: 35.0,
-                    width: 35.0,
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 10.0,
-                      horizontal: 15.0,
-                    ),
-                    decoration: const BoxDecoration(
-                      color: Colors.brown,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      FontAwesomeIcons.x,
-                      size: 15.0,
-                      color: Colors.white,
+                //
+                Positioned(
+                  right: 0.0,
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          await _showImageDialogBox();
+                        },
+                        child: Container(
+                          height: 35.0,
+                          width: 35.0,
+                          margin: const EdgeInsets.symmetric(
+                            vertical: 10.0,
+                            horizontal: 15.0,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Colors.green,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            FontAwesomeIcons.image,
+                            size: 15.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => print('Remove'),
+                        child: Container(
+                          height: 35.0,
+                          width: 35.0,
+                          margin: const EdgeInsets.symmetric(
+                            vertical: 10.0,
+                            horizontal: 15.0,
+                          ),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            FontAwesomeIcons.trash,
+                            size: 15.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      height: 35.0,
+                      width: 35.0,
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 10.0,
+                        horizontal: 15.0,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: Colors.brown,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        FontAwesomeIcons.x,
+                        size: 15.0,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -122,13 +165,6 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Imagens Selecionadas: x',
-                    style: TextStyle(
-                      fontSize: 13.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
                   AdsFieldWidget(
                     icon: FontAwesomeIcons.circleInfo,
                     controller: firstNameController,
@@ -256,143 +292,86 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
       ))),
     );
   }
-}
 
-class AdsFieldWidget extends StatefulWidget {
-  final TextEditingController controller;
-  final String? Function(String?)? validator;
-  final String textLabel;
-  final String fieldLabel;
-  final IconData icon;
-  const AdsFieldWidget({
-    super.key,
-    required this.controller,
-    required this.validator,
-    required this.textLabel,
-    required this.fieldLabel,
-    required this.icon,
-  });
-
-  @override
-  State<AdsFieldWidget> createState() => _AdsFieldWidgetState();
-}
-
-class _AdsFieldWidgetState extends State<AdsFieldWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.textLabel,
-          style: const TextStyle(
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
+  Future<void> _showImageDialogBox() async {
+    //final authData = Provider.of<UserAuthProvider>(context, listen: false);
+    AppUtilsProvider appUtils = AppUtilsProvider();
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.brown,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+          title: const Text(
+            'Carregar imagem de perfil.',
+            style: TextStyle(
+              fontSize: 15.0,
+              color: Colors.white,
+            ),
           ),
-        ),
-        CustomInputText(
-          icon: widget.icon,
-          isPassword: false,
-          controller: widget.controller,
-          keyboardType: TextInputType.name,
-          label: widget.fieldLabel,
-          fontSize: 15.0,
-          validator: widget.validator,
-        ),
-      ],
-    );
-  }
-}
-
-class AdsLocationFieldWidget extends StatefulWidget {
-  final TextEditingController controller;
-  final String? Function(String?)? validator;
-  final String textLabel;
-  final String fieldLabel;
-  const AdsLocationFieldWidget({
-    super.key,
-    required this.controller,
-    required this.validator,
-    required this.textLabel,
-    required this.fieldLabel,
-  });
-
-  @override
-  State<AdsLocationFieldWidget> createState() => _AdsLocationFieldWidgetState();
-}
-
-class _AdsLocationFieldWidgetState extends State<AdsLocationFieldWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.textLabel,
-          style: const TextStyle(
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        LocationInputText(
-          icon: Icons.location_on,
-          controller: widget.controller,
-          keyboardType: TextInputType.emailAddress,
-          label: widget.fieldLabel,
-          fontSize: 15.0,
-          validator: widget.validator,
-        ),
-      ],
-    );
-  }
-}
-
-class CustomDropdownMenu extends StatefulWidget {
-  String dropdownValue;
-  final List<String> menuList;
-  final String textLabel;
-  CustomDropdownMenu({
-    super.key,
-    required this.dropdownValue,
-    required this.menuList,
-    required this.textLabel,
-  });
-
-  @override
-  State<CustomDropdownMenu> createState() => _CustomDropdownMenuState();
-}
-
-class _CustomDropdownMenuState extends State<CustomDropdownMenu> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.textLabel,
-          style: const TextStyle(
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        DropdownButton<String>(
-          alignment: Alignment.centerLeft,
-          value: widget.dropdownValue,
-          onChanged: (String? newValue) {
-            setState(() {
-              widget.dropdownValue = newValue!;
-            });
-          },
-          items: widget.menuList.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(
-                value,
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: ElevatedButton(
+                    onPressed: () => appUtils.chooseImage(
+                      picker,
+                      _image,
+                      true,
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.white),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                      ),
+                    ),
+                    child: const Text(
+                      'Galeria',
+                      style: TextStyle(
+                        color: Colors.brown,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15.0,
+                      ),
+                    ),
+                    //color: Colors.pinkAccent,
+                  ),
+                ),
               ),
-            );
-          }).toList(),
-        ),
-      ],
+              const SizedBox(width: 10.0),
+              Expanded(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.white),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                      ),
+                    ),
+                    child: const Text(
+                      'Câmera',
+                      style: TextStyle(color: Colors.brown),
+                    ),
+                    onPressed: () => appUtils.chooseImage(
+                      picker,
+                      _image,
+                      false,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
