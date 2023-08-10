@@ -3,12 +3,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hent_house_seller/core/utils.dart';
 import 'package:hent_house_seller/core/validator_mixin.dart';
+import 'package:hent_house_seller/features/presentation/providers/user_provider.dart';
 import 'package:hent_house_seller/features/presentation/upload_ads/widgets/ads_filed_widget.dart';
 import 'package:hent_house_seller/features/presentation/upload_ads/widgets/ads_location_widget.dart';
 import 'package:hent_house_seller/features/presentation/upload_ads/widgets/custom_dropdown_widget.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class UploadAdsScreen extends StatefulWidget {
   static const routeName = '/upload-ads-screen';
@@ -294,8 +295,7 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
   }
 
   Future<void> _showImageDialogBox() async {
-    //final authData = Provider.of<UserAuthProvider>(context, listen: false);
-    AppUtilsProvider appUtils = AppUtilsProvider();
+    final authData = Provider.of<UserAuthProvider>(context, listen: false);
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -318,11 +318,7 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: ElevatedButton(
-                    onPressed: () => appUtils.chooseImage(
-                      picker,
-                      _image,
-                      true,
-                    ),
+                    onPressed: () => chooseImage(),
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.white),
                       shape: MaterialStateProperty.all(
@@ -360,11 +356,7 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                       'Câmera',
                       style: TextStyle(color: Colors.brown),
                     ),
-                    onPressed: () => appUtils.chooseImage(
-                      picker,
-                      _image,
-                      false,
-                    ),
+                    onPressed: () {},
                   ),
                 ),
               ),
@@ -373,5 +365,21 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
         );
       },
     );
+  }
+
+  chooseImage() async {
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 20,
+    );
+
+    if (pickedFile != null) {
+      print("Picked image path: ${pickedFile.path}");
+      setState(() {
+        _image.add(File(pickedFile.path));
+      });
+    } else {
+      print("Image selection cancelled.");
+    }
   }
 }
