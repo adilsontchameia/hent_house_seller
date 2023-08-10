@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hent_house_seller/core/validator_mixin.dart';
-import 'package:hent_house_seller/features/presentation/onboard/widgets/smooth_dots_indicator.dart';
 import 'package:hent_house_seller/features/presentation/providers/user_provider.dart';
 import 'package:hent_house_seller/features/presentation/upload_ads/widgets/ads_filed_widget.dart';
 import 'package:hent_house_seller/features/presentation/upload_ads/widgets/ads_location_widget.dart';
@@ -25,25 +24,62 @@ class UploadAdsScreen extends StatefulWidget {
 class _UploadAdsScreenState extends State<UploadAdsScreen>
     with ValidationMixins {
   // Controllers
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController surnNameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController monthlyCashController = TextEditingController();
   final TextEditingController currentLocationController =
       TextEditingController();
+  bool waterValue = false;
+  bool electricityValue = false;
+  bool yardValue = false;
   final List<File> _image = [];
   ImagePicker picker = ImagePicker();
   final _controller = PageController();
   //Dropdown Values
-  String dropdownValue = '1';
+  String toiletValue = '1';
+  String bedRoomsValue = '1';
+  String kitchenValue = '1';
+  String livingRoomValue = '1';
   List<String> menuList = ['1', '2', '3', '4', '+4'];
-  String dropdownBoolValue = 'SIM';
-  List<String> menuBoolList = ['SIM', 'NÃO'];
+  //
   String dropdownCategoryValue = 'Casa';
   List<String> menuCategoryList = ['Casa', 'Quarto', 'Apartamento', 'Vivenda'];
+  //
   String dropdownProvinceValue = 'Cuando Cubango';
   List<String> menuProvinceList = ['Cuando Cubango', 'Huíla', 'Huambo', 'Uíge'];
+
+  final UserAuthProvider _userAuthProvider = UserAuthProvider();
+  publishAds() {
+    final String title = titleController.text.trim();
+    final String description = descriptionController.text.trim();
+    final String phoneNumber = phoneNumberController.text.trim();
+    final String monthlyCash = monthlyCashController.text.trim();
+    final String currentLocation = currentLocationController.text.trim();
+    final String categoryValue = dropdownCategoryValue;
+    final String provinceValue = dropdownProvinceValue;
+    log('tittle: $title');
+    log('description: $description');
+    log('monthlyCash: $monthlyCash');
+    log('monthlyCash: $phoneNumber');
+    log('currentLocation: $currentLocation');
+    log('waterValue: $waterValue');
+    log('electicityValue: $electricityValue');
+    log('yardValue: $yardValue');
+    log('roomValue: $toiletValue');
+    log('bedRoomValue: $bedRoomsValue');
+    log('kitchenValue: $kitchenValue');
+    log('roomValue: $livingRoomValue');
+    log('categoryValue: $categoryValue');
+    log('provinceValue: $provinceValue');
+    log('image: $_image');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _userAuthProvider.init();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,13 +105,19 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                         scrollDirection: Axis.horizontal,
                         itemCount: _image.length,
                         itemBuilder: (context, index) {
-                          if (_image.isEmpty) {
-                            return Image.asset(
-                              'assets/person.png',
-                              fit: BoxFit.fitHeight,
-                            );
-                          } else {
-                            return Stack(
+                          return Visibility(
+                            visible: index == 0,
+                            replacement: Container(
+                              height: height,
+                              width: width,
+                              decoration: const BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: AssetImage('assets/person.png'),
+                                ),
+                              ),
+                            ),
+                            child: Stack(
                               children: [
                                 Container(
                                   height: height,
@@ -115,8 +157,8 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                                   ),
                                 ),
                               ],
-                            );
-                          }
+                            ),
+                          );
                         }),
                   ),
                 ),
@@ -142,10 +184,12 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                 ), //
               ],
             ),
+            /*
             SmoothDotsIndicator(
               controller: _controller,
               itemCount: _image.length,
             ),
+            */
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Column(
@@ -184,99 +228,145 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                   ),
                   AdsFieldWidget(
                     icon: FontAwesomeIcons.circleInfo,
-                    controller: firstNameController,
+                    controller: titleController,
                     validator: (value) => insNotEmpty(value),
                     textLabel: 'Titulo do Anúncio',
                     fieldLabel: 'Titulo',
                   ),
                   AdsFieldWidget(
                     icon: FontAwesomeIcons.info,
-                    controller: firstNameController,
+                    controller: descriptionController,
                     validator: (value) => insNotEmpty(value),
                     textLabel: 'Descrição',
                     fieldLabel: 'Descrição',
                   ),
                   AdsFieldWidget(
                     icon: FontAwesomeIcons.phone,
-                    controller: firstNameController,
+                    controller: phoneNumberController,
                     validator: (value) => insNotEmpty(value),
                     textLabel: 'Número de Telefone',
                     fieldLabel: 'Contacto',
                   ),
                   AdsFieldWidget(
                     icon: FontAwesomeIcons.moneyBill,
-                    controller: firstNameController,
+                    controller: monthlyCashController,
                     validator: (value) => insNotEmpty(value),
                     textLabel: 'Valor Mensal',
                     fieldLabel: 'Valor',
                   ),
                   AdsLocationFieldWidget(
-                    controller: firstNameController,
+                    controller: currentLocationController,
                     validator: (value) => insNotEmpty(value),
                     textLabel: 'Localização',
                     fieldLabel: 'Localização',
                   ),
-                  Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: 15.0,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SwitchWithTitleWidget(
+                        label: 'Água',
+                        value: waterValue,
+                        onChanged: (bool newValue) {
+                          setState(() {
+                            waterValue = newValue;
+                          });
+                        },
+                      ),
+                      SwitchWithTitleWidget(
+                          label: 'Eletricidade',
+                          value: electricityValue,
+                          onChanged: (bool newValue) {
+                            setState(() {
+                              electricityValue = newValue;
+                            });
+                          }),
+                      SwitchWithTitleWidget(
+                          label: 'Quintal',
+                          value: yardValue,
+                          onChanged: (bool newValue) {
+                            setState(() {
+                              yardValue = newValue;
+                            });
+                          }),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       CustomDropdownMenu(
                         textLabel: 'WC',
-                        dropdownValue: dropdownValue,
+                        dropdownValue: toiletValue,
                         menuList: menuList,
-                      ),
-                      CustomDropdownMenu(
-                        textLabel: 'Água',
-                        dropdownValue: dropdownBoolValue,
-                        menuList: menuBoolList,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            toiletValue = newValue!;
+                          });
+                        },
                       ),
                       CustomDropdownMenu(
                         textLabel: 'Quartos',
-                        dropdownValue: dropdownValue,
+                        dropdownValue: bedRoomsValue,
                         menuList: menuList,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            bedRoomsValue = newValue!;
+                          });
+                        },
                       ),
                       CustomDropdownMenu(
                         textLabel: 'Cozinha',
-                        dropdownValue: dropdownValue,
+                        dropdownValue: kitchenValue,
                         menuList: menuList,
-                      ),
-                      CustomDropdownMenu(
-                        textLabel: 'Quintal',
-                        dropdownValue: dropdownBoolValue,
-                        menuList: menuBoolList,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            kitchenValue = newValue!;
+                          });
+                        },
                       ),
                     ],
                   ),
-                  Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: 10.0,
-                    children: [
-                      CustomDropdownMenu(
-                        textLabel: 'Eletricidade',
-                        dropdownValue: dropdownBoolValue,
-                        menuList: menuBoolList,
-                      ),
-                      CustomDropdownMenu(
-                        textLabel: 'Sala de Estar',
-                        dropdownValue: dropdownValue,
-                        menuList: menuList,
-                      ),
-                      CustomDropdownMenu(
-                        textLabel: 'Categoria',
-                        dropdownValue: dropdownCategoryValue,
-                        menuList: menuCategoryList,
-                      ),
-                      CustomDropdownMenu(
-                        textLabel: 'Província',
-                        dropdownValue: dropdownProvinceValue,
-                        menuList: menuProvinceList,
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomDropdownMenu(
+                          textLabel: 'Sala',
+                          dropdownValue: livingRoomValue,
+                          menuList: menuList,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              livingRoomValue = newValue!;
+                            });
+                          },
+                        ),
+                        CustomDropdownMenu(
+                          textLabel: 'Categoria',
+                          dropdownValue: dropdownCategoryValue,
+                          menuList: menuCategoryList,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownCategoryValue = newValue!;
+                            });
+                          },
+                        ),
+                        CustomDropdownMenu(
+                          textLabel: 'Província',
+                          dropdownValue: dropdownProvinceValue,
+                          menuList: menuProvinceList,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownProvinceValue = newValue!;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(
                     width: width,
                     child: ElevatedButton.icon(
-                      onPressed: () => log('Uploading'),
+                      onPressed: () => publishAds(),
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
                           Colors.brown.shade500,
@@ -334,7 +424,9 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: ElevatedButton(
-                    onPressed: () => chooseImage(),
+                    onPressed: () async {
+                      await chooseImage(true);
+                    },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.white),
                       shape: MaterialStateProperty.all(
@@ -368,11 +460,13 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                         ),
                       ),
                     ),
+                    onPressed: () async {
+                      await chooseImage(false);
+                    },
                     child: const Text(
                       'Câmera',
                       style: TextStyle(color: Colors.brown),
                     ),
-                    onPressed: () {},
                   ),
                 ),
               ),
@@ -383,9 +477,9 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
     );
   }
 
-  chooseImage() async {
+  Future<void> chooseImage(bool isFromGallery) async {
     final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
+      source: isFromGallery ? ImageSource.gallery : ImageSource.camera,
       imageQuality: 20,
     );
 
@@ -397,5 +491,41 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
     } else {
       print("Image selection cancelled.");
     }
+  }
+}
+
+class SwitchWithTitleWidget extends StatefulWidget {
+  bool value;
+  final String label;
+  Function(bool)? onChanged;
+  SwitchWithTitleWidget({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  State<SwitchWithTitleWidget> createState() => _SwitchWithTitleWidgetState();
+}
+
+class _SwitchWithTitleWidgetState extends State<SwitchWithTitleWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          widget.label,
+          style: const TextStyle(
+            fontSize: 15.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Switch(
+          value: widget.value,
+          onChanged: widget.onChanged,
+        ),
+      ],
+    );
   }
 }
