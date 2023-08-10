@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hent_house_seller/core/validator_mixin.dart';
+import 'package:hent_house_seller/features/presentation/onboard/widgets/smooth_dots_indicator.dart';
 import 'package:hent_house_seller/features/presentation/providers/user_provider.dart';
 import 'package:hent_house_seller/features/presentation/upload_ads/widgets/ads_filed_widget.dart';
 import 'package:hent_house_seller/features/presentation/upload_ads/widgets/ads_location_widget.dart';
@@ -33,6 +34,7 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
       TextEditingController();
   final List<File> _image = [];
   ImagePicker picker = ImagePicker();
+  final _controller = PageController();
   //Dropdown Values
   String dropdownValue = '1';
   List<String> menuList = ['1', '2', '3', '4', '+4'];
@@ -53,7 +55,7 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
           child: SingleChildScrollView(
               child: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Stack(
               children: [
@@ -63,6 +65,7 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                     height: height * 0.5,
                     width: width,
                     child: ListView.builder(
+                        controller: _controller,
                         scrollDirection: Axis.horizontal,
                         itemCount: _image.length,
                         itemBuilder: (context, index) {
@@ -72,100 +75,113 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                               fit: BoxFit.fitHeight,
                             );
                           } else {
-                            return Container(
-                              height: 250.0,
-                              width: width,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: FileImage(_image[index]),
+                            return Stack(
+                              children: [
+                                Container(
+                                  height: height,
+                                  width: width,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: FileImage(_image[index]),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Positioned(
+                                  right: 0.0,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _image.remove(_image[index]);
+                                      });
+                                    },
+                                    child: Container(
+                                      height: 35.0,
+                                      width: 35.0,
+                                      margin: const EdgeInsets.symmetric(
+                                        vertical: 10.0,
+                                        horizontal: 15.0,
+                                      ),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        FontAwesomeIcons.trash,
+                                        size: 15.0,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             );
                           }
                         }),
                   ),
                 ),
-                //
-                Positioned(
-                  right: 0.0,
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          await _showImageDialogBox();
-                        },
-                        child: Container(
-                          height: 35.0,
-                          width: 35.0,
-                          margin: const EdgeInsets.symmetric(
-                            vertical: 10.0,
-                            horizontal: 15.0,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.image,
-                            size: 15.0,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => print('Remove'),
-                        child: Container(
-                          height: 35.0,
-                          width: 35.0,
-                          margin: const EdgeInsets.symmetric(
-                            vertical: 10.0,
-                            horizontal: 15.0,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.trash,
-                            size: 15.0,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    height: 35.0,
+                    width: 35.0,
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 10.0,
+                      horizontal: 15.0,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Colors.brown,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      FontAwesomeIcons.x,
+                      size: 15.0,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                Positioned(
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      height: 35.0,
-                      width: 35.0,
-                      margin: const EdgeInsets.symmetric(
-                        vertical: 10.0,
-                        horizontal: 15.0,
+                ), //
+              ],
+            ),
+            SmoothDotsIndicator(
+              controller: _controller,
+              itemCount: _image.length,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: width,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        await _showImageDialogBox();
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          Colors.green,
+                        ),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                        ),
                       ),
-                      decoration: const BoxDecoration(
-                        color: Colors.brown,
-                        shape: BoxShape.circle,
+                      label: const Text(
+                        'Carregar Imagem',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15.0,
+                        ),
                       ),
-                      child: const Icon(
-                        FontAwesomeIcons.x,
-                        size: 15.0,
+                      icon: const Icon(
+                        FontAwesomeIcons.image,
                         color: Colors.white,
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10.0),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
                   AdsFieldWidget(
                     icon: FontAwesomeIcons.circleInfo,
                     controller: firstNameController,
@@ -272,7 +288,7 @@ class _UploadAdsScreenState extends State<UploadAdsScreen>
                         ),
                       ),
                       label: const Text(
-                        'Carregar',
+                        'Publicar',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
