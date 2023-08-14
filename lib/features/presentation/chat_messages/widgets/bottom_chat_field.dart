@@ -24,7 +24,7 @@ class _BottomChatFieldState extends State<BottomChatField> {
       if (isWritting && message.isNotEmpty) {
         _chatService.sendTextMessage(
           message: message,
-          sellerId: widget.receiverId,
+          userId: widget.receiverId,
         );
       }
       _messageController.text = '';
