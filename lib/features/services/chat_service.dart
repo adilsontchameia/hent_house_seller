@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -18,19 +16,18 @@ class ChatService {
 
   sendTextMessage({
     required String message,
-    required String sellerId,
+    required String userId,
   }) async {
     try {
       final timeSent = DateTime.now();
       final currentId = auth.currentUser!.uid;
-      log('ID from ARGS: $sellerId');
       await FirebaseFirestore.instance
           .collection('messages')
-          .doc('ROqkNU4TrxRIsJQGpu5gzalMLZF2')
+          .doc(userId)
           .collection('chats')
           .add({
         'senderId': currentId,
-        'receiverId': 'ROqkNU4TrxRIsJQGpu5gzalMLZF2',
+        'receiverId': userId,
         'message': message,
         'date': timeSent,
       });
@@ -38,7 +35,7 @@ class ChatService {
       // Update last message for the seller
       await FirebaseFirestore.instance
           .collection('messages')
-          .doc(sellerId)
+          .doc(currentId)
           .set({
         'lastMessage': message,
         'lastMessageDate': timeSent,
@@ -47,20 +44,17 @@ class ChatService {
       //_ User who we are talking to
       await FirebaseFirestore.instance
           .collection('messages')
-          .doc(sellerId)
+          .doc(currentId)
           .collection('chats')
           .add({
         'senderId': currentId,
-        'receiverId': sellerId,
+        'receiverId': userId,
         'message': message,
         'date': timeSent,
       });
 
       // Update last message for the current user
-      await FirebaseFirestore.instance
-          .collection('messages')
-          .doc(currentId)
-          .set({
+      await FirebaseFirestore.instance.collection('messages').doc(userId).set({
         'lastMessage': message,
         'lastMessageDate': timeSent,
       });
