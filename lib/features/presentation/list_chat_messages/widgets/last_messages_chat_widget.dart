@@ -39,7 +39,7 @@ class LastMessagesChatWidget extends StatelessWidget {
                     ChatMessagesScreen.routeName,
                     arguments: {
                       'name': 'Name', //TODO store userName on model either
-                      'uid': currentUserUid,
+                      'uid': uid,
                     },
                   ),
                   child: FutureBuilder<Map<String, dynamic>>(
