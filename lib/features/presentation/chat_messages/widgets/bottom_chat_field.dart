@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hent_house_seller/features/services/chat_service.dart';
+import 'package:hent_house_seller/features/services/user_manager.dart';
 
 class BottomChatField extends StatefulWidget {
   final String receiverId;
@@ -16,6 +17,7 @@ class BottomChatField extends StatefulWidget {
 class _BottomChatFieldState extends State<BottomChatField> {
   final TextEditingController _messageController = TextEditingController();
   final ChatService _chatService = ChatService();
+  final UserManager _userManager = UserManager();
   bool isWritting = false;
 
   sendTextMessage() async {
@@ -28,18 +30,25 @@ class _BottomChatFieldState extends State<BottomChatField> {
         );
       }
       _messageController.text = '';
+      _userManager.isNotWriting();
     });
   }
 
   @override
   void dispose() {
     _messageController.dispose();
+    _userManager.isNotWriting();
     super.dispose();
   }
 
   void _onTextChanged(String value) {
     setState(() {
       isWritting = value.trim().isNotEmpty;
+      if (isWritting) {
+        _userManager.isWriting();
+      } else {
+        _userManager.isNotWriting();
+      }
     });
   }
 
