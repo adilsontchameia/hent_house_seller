@@ -2,9 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hent_house_seller/app/my_app.dart';
+import 'package:hent_house_seller/core/utils.dart';
+import 'package:hent_house_seller/features/presentation/providers/advertisement_provider.dart';
 import 'package:hent_house_seller/features/presentation/providers/user_data_provider.dart';
 import 'package:hent_house_seller/features/presentation/providers/user_provider.dart';
-import 'package:hent_house_seller/features/services/chat_service.dart';
 import 'package:hent_house_seller/features/services/user_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,14 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<HomeAdvertisementProvider>(
+          create: (_) => HomeAdvertisementProvider(),
+          lazy: false,
+        ),
+        ChangeNotifierProvider<AppUtilsProvider>(
+          create: (_) => AppUtilsProvider(),
+          lazy: false,
+        ),
         ChangeNotifierProvider<UserAuthProvider>(
           create: (_) => UserAuthProvider(),
           lazy: false,
@@ -29,10 +38,6 @@ void main() async {
         ),
         ChangeNotifierProvider<UserDataProvider>(
           create: (_) => UserDataProvider(),
-          lazy: false,
-        ),
-        ChangeNotifierProvider<ChatService>(
-          create: (_) => ChatService(),
           lazy: false,
         ),
       ],
