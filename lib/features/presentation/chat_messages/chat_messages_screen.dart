@@ -75,7 +75,7 @@ class _ChatMessagesScreenState extends State<ChatMessagesScreen> {
                       ),
                       StreamBuilder<DocumentSnapshot>(
                         stream: FirebaseFirestore.instance
-                            .collection('sellers')
+                            .collection('clients')
                             .doc(widget.uid)
                             .snapshots(),
                         builder: (context, snapshot) {
