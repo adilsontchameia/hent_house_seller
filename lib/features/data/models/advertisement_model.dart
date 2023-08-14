@@ -30,7 +30,7 @@ class AdvertisementModel {
   double? latitude;
   double? longitude;
   bool? isPromo;
-  List<dynamic>? image;
+  List<String>? image;
 
   AdvertisementModel({
     this.id,
@@ -81,7 +81,7 @@ class AdvertisementModel {
         latitude: json["latitude"]?.toDouble(),
         longitude: json["longitude"]?.toDouble(),
         isPromo: json["isPromo"] ?? false,
-        image: json["image"] ?? '',
+        image: List<String>.from(json["image"] ?? []),
       );
 
   Map<String, dynamic> toJson() => {
@@ -133,6 +133,7 @@ class AdvertisementModel {
     latitude = data['latitude']?.toDouble();
     longitude = data['longitude']?.toDouble();
     isPromo = data['isPromo'];
-    image = data['image'];
+    image = List<String>.from(
+        data['image'] ?? []); // Correctly decode the list of strings
   }
 }
