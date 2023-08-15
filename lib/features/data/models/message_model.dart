@@ -1,5 +1,3 @@
-import '../../presentation/filtered_advertisiment/filtered_advertisiment.dart';
-
 class MessageModel {
   final String senderId;
   final String receiverId;
@@ -33,7 +31,7 @@ class MessageModel {
       senderId: map['senderId'] ?? '',
       receiverId: map['receiverId'] ?? '',
       message: map['message'] ?? '',
-      date: (map['date'] as Timestamp).toDate(),
+      date: DateTime.fromMillisecondsSinceEpoch(map['date'] ?? 0),
       messageId: map['messageId'] ?? '',
       isSeen: map['isSeen'] ?? false,
     );

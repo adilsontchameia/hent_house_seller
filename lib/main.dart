@@ -6,6 +6,7 @@ import 'package:hent_house_seller/core/utils.dart';
 import 'package:hent_house_seller/features/presentation/providers/advertisement_provider.dart';
 import 'package:hent_house_seller/features/presentation/providers/user_data_provider.dart';
 import 'package:hent_house_seller/features/presentation/providers/user_provider.dart';
+import 'package:hent_house_seller/features/services/chat_service.dart';
 import 'package:hent_house_seller/features/services/user_manager.dart';
 import 'package:provider/provider.dart';
 
@@ -38,6 +39,10 @@ void main() async {
         ),
         ChangeNotifierProvider<UserDataProvider>(
           create: (_) => UserDataProvider(),
+          lazy: false,
+        ),
+        ChangeNotifierProvider<ChatService>(
+          create: (_) => ChatService(),
           lazy: false,
         ),
       ],
