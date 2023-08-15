@@ -74,14 +74,12 @@ class _ChatListState extends State<ChatList> {
                   if (!message.isSeen &&
                       message.receiverId == _authService.getUser().uid) {
                     _chatService.setChatMessageSeen(
-                      message.senderId,
+                      message.receiverId,
                       message.messageId,
                     );
                   }
 
-                  final formattedDate =
-                      DateFormat('hh:mm a').format(message.date);
-
+                  String formattedDate = DateFormat.jm().format(message.date);
                   if (isMe) {
                     return MyMessageCard(
                       message: message.message,
