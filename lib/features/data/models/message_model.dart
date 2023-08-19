@@ -1,3 +1,5 @@
+import '../../presentation/filtered_advertisiment/filtered_advertisiment.dart';
+
 class MessageModel {
   final String senderId;
   final String receiverId;
@@ -20,18 +22,21 @@ class MessageModel {
       'senderId': senderId,
       'receiverId': receiverId,
       'message': message,
-      'date': date.millisecondsSinceEpoch,
+      'date': date != null ? Timestamp.fromDate(date) : null,
       'messageId': messageId,
       'isSeen': isSeen,
     };
   }
 
   factory MessageModel.fromMap(Map<String, dynamic> map) {
+    Timestamp? timestamp = map['date'] as Timestamp?;
+    DateTime? timeSentDateTime = timestamp?.toDate();
+
     return MessageModel(
       senderId: map['senderId'] ?? '',
       receiverId: map['receiverId'] ?? '',
       message: map['message'] ?? '',
-      date: DateTime.fromMillisecondsSinceEpoch(map['date'] ?? 0),
+      date: timeSentDateTime!,
       messageId: map['messageId'] ?? '',
       isSeen: map['isSeen'] ?? false,
     );

@@ -15,6 +15,7 @@ class SellerModel {
   bool? isVerified;
   bool? isTopSeller;
   bool? isOnline;
+  bool? isTyping;
   String? address;
   double? latitude;
   double? longitude;
@@ -30,6 +31,7 @@ class SellerModel {
     this.isVerified,
     this.isTopSeller,
     this.isOnline,
+    this.isTyping,
     this.address,
     this.latitude,
     this.longitude,
@@ -46,6 +48,7 @@ class SellerModel {
         isVerified: json["isVerified"] ?? true,
         isTopSeller: json["isTopSeller"] ?? false,
         isOnline: json["isOnline"] ?? true,
+        isTyping: json["isTyping"] ?? false,
         address: json["address"] ?? '',
         latitude: json["latitude"]?.toDouble(),
         longitude: json["longitude"]?.toDouble(),
@@ -62,6 +65,7 @@ class SellerModel {
         "isVerified": isVerified,
         "isTopSeller": isTopSeller,
         "isOnline": isOnline,
+        "isTyping": isTyping,
         "address": address,
         "latitude": latitude,
         "longitude": longitude,
