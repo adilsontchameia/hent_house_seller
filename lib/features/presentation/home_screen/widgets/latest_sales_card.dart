@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hent_house_seller/core/currency_formart.dart';
+import 'package:hent_house_seller/core/utils.dart';
 import 'package:hent_house_seller/features/data/models/advertisement_model.dart';
 import 'package:hent_house_seller/features/presentation/home_screen/widgets/verified_seller_name.dart';
 import 'package:hent_house_seller/features/presentation/sale_detail/sale_detail_screen.dart';
@@ -93,7 +94,7 @@ class LatestSalesCard extends StatelessWidget {
                             child: VerifiedSellerName(
                               sellerName: advertisement.sellerName!,
                               publishedDate:
-                                  advertisement.publishedDate!.toString(),
+                                  formatDateTime(advertisement.publishedDate!),
                               sellerId: advertisement.sellerId!,
                             ),
                           ),
